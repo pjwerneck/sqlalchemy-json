@@ -1,7 +1,7 @@
-from .alchemy import NestedJsonObject, NestedMutable, JsonObject
+from .alchemy import NestedJsonList, NestedJsonDict, JsonObject
 
 __all__ = (
-    'NestedJsonObject',
-    'NestedMutable',
+    'NestedJsonList',
+    'NestedJsonDict',
     'JsonObject'
-)
+    )
