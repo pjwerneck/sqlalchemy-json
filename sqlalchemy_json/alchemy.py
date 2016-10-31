@@ -2,6 +2,7 @@
 import json
 
 import sqlalchemy
+from sqlalchemy import types
 from sqlalchemy.ext import mutable
 
 from . import track
@@ -43,13 +44,25 @@ class NestedMutableList(mutable.MutableList, track.TrackedList):
 
 class _JsonTypeDecorator(sqlalchemy.TypeDecorator):
     """Enables JSON storage by encoding and decoding on the fly."""
-    impl = sqlalchemy.String
+    impl = sqlalchemy.Text
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'sqlite':
+            return dialect.type_descriptor(types.String)
+        else:
+            return dialect.type_descriptor(types.JSON)
 
     def process_bind_param(self, value, dialect):
-        return json.dumps(value)
+        if dialect.name == 'sqlite':
+            return json.dumps(value)
+        else:
+            return value
 
     def process_result_value(self, value, dialect):
-        return json.loads(value)
+        if dialect.name == 'sqlite':
+            return json.loads(value)
+        else:
+            return value
 
 
 class JsonObject(_JsonTypeDecorator):
